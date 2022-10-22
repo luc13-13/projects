@@ -3,6 +3,7 @@
 */*.iml
 *.cmd
 mvnw
+*.mvn
 
 # Compiled class file
 *.class

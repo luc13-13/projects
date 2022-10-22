@@ -1,0 +1,16 @@
+server:
+  port: 18889
+spring:
+  application:
+    name:
+      service-test-luc1
+  cloud:
+    nacos:
+      server-addr: 172.26.241.139:8848
+      username: luc
+      password: luc123456
+      discovery:
+        enabled: true
+        namespace: test-luc
+        group: DEFAULT_GROUP
+

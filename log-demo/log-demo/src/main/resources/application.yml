@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: log-demo
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: luc
+    password: luc123456
+    url: jdbc:mysql://localhost:3306/auth_center?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=FALSE
+server:
+  port: 8881
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  global-config:
+    db-config:
+      logic-delete-field: status
+      logic-delete-value: 0
+      logic-not-delete-value: 1
+logging:
+  config: classpath:logback-lc.xml
+  level:
+    com.lc.logdemo: info
