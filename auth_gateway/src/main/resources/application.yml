@@ -42,3 +42,10 @@ logging:
   file:
     path: ${spring.application.name}/logs
 
+luc-gateway:
+  white-url:
+    - /test/**
+  white-resource: lucheng
+
+
+

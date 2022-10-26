@@ -1,27 +1,22 @@
 package com.lc.auth.center.filter;
 
-import com.lc.auth.center.config.GlobalPropertiesConfig;
-import com.plumelog.core.util.StringUtils;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.gateway.filter.FilterDefinition;
+import org.springframework.stereotype.Component;
+import com.lc.auth.center.config.GlobalPropertiesConfig;
+import com.lc.auth.center.enums.RequestAttribute;
+import com.plumelog.core.util.StringUtils;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
 
-import java.net.URI;
+
 
 @Component
 @Slf4j
@@ -29,14 +24,16 @@ public class TokenGlobalFilter extends AbstractGlobalFilter implements GlobalFil
 
     @Autowired
     private GlobalPropertiesConfig globalPropertiesConfig;
+
+
     /**
      *
      * @param exchange 持有request和response的容器，并用map封装路由等属性
      *                 (key的取值参考{@link ServerWebExchangeUtils})，
      *                 维持原有请求实例不变，可以通过{@link ServerWebExchange#mutate()}
      *                 修改内部request， 包括修改请求头;
-     * @param chain
-     * @return
+     * @param chain gateway中的过滤链路
+     * @return 将过滤链路继续向下传递
      */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -48,18 +45,23 @@ public class TokenGlobalFilter extends AbstractGlobalFilter implements GlobalFil
         ServerHttpRequest newRequest = exchange.getRequest().mutate().headers(
                 httpHeaders -> httpHeaders.add("newHeader","11111")
         ).build();
+        //
         try{
-            // 1、校验请求头是否符合要求
+            // 1、可以放行的路径:校验exchange中Authorization属性值是否为LuCheng
+            if(skip(exchange, RequestAttribute.SKIP_TOKEN)) {
+                return chain.filter(exchange);
+            }
+            // 2、校验请求头是否符合要求：存在token
             checkHeaders(request);
             log.info("nacos配置中心: {}", globalPropertiesConfig.getName());
-            // 2、校验token中的租户是否有效, 如果有效则将请求链放行
+            // 3、校验token中的租户是否有效：账号未被锁定
 //            Mono<Void> token = parseToken(exchange, chain);
 //            if(token != null) {
 //                return token;
 //            }
-            // 3、
+            // 3、向认证中心发送请求，校验token是否满足uri的权限要求
         } catch (TokenException e) {
-            // token缺失则将请求重定向到登录接口
+            // token缺失则将请求重定向到登录界面
 //            ServerWebExchangeUtils.setResponseStatus(exchange, HttpStatus.FOUND);
 //            response = (ServerHttpResponse) exchange.getResponse();
 //            response.getHeaders().set("Location","http://localhost:8889/login");
@@ -82,9 +84,14 @@ public class TokenGlobalFilter extends AbstractGlobalFilter implements GlobalFil
 
     @Override
     public int getOrder() {
-        return 0;
+        return 1;
     }
 
+    /**
+     * 校验请求头中是否有 Authorization 属性
+     * @param request http请求
+     * @throws TokenException 缺失token或token过期异常
+     */
     private void checkHeaders(ServerHttpRequest request) throws TokenException {
         HttpHeaders headers = request.getHeaders();
         if(headers.isEmpty()) {
