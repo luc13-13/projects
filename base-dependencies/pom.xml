@@ -31,12 +31,16 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <spring-cloud.version>2021.0.4</spring-cloud.version>
+        <spring-cloud-gateway.versino>3.1.4</spring-cloud-gateway.versino>
+        <spring-cloud-loadbalance.version>3.1.4</spring-cloud-loadbalance.version>
         <spring-cloud-alibaba.version>2021.0.4.0</spring-cloud-alibaba.version>
         <spring-boot.version>2.7.4</spring-boot.version>
         <mybatis-plus.version>3.5.0</mybatis-plus.version>
         <mysql-connector.version>8.0.28</mysql-connector.version>
         <lombok.version>1.18.24</lombok.version>
         <plumelog-logback.version>3.5.3</plumelog-logback.version>
+        <framework-core.version>1.0-SNAPSHOT</framework-core.version>
+
     </properties>
 
     <dependencies>
@@ -72,7 +76,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.7.4</version>
+                <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -114,6 +118,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.6.7</version>
             </plugin>
         </plugins>
     </build>

@@ -1,14 +1,12 @@
 spring:
   cloud:
     nacos:
-      server-addr: 172.26.241.139:8848
+      server-addr: 127.0.0.1:8848
       username: luc
       password: luc123456
       config:
-        namespace: test-luc
-        prefix: auth-gateway
-#        file-extension: yml
-#        name: auth-gateway
+        namespace: com-lc-dev
+        prefix: auth-gateway-dev
         file-extension: yaml # nacos只支持yaml结尾的文件， 如果使用yml的话则识别不出来
       discovery:
-        namespace: test-luc
+        namespace: com-lc-dev
